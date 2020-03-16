@@ -68,24 +68,24 @@ class GameContainer extends Component{
     this.setState({playerAnswers: newAnswers})
   }
 
-  saveGameDataToDb = () => {
-    // Hard coded to test POST to database - to refactor//
-    const playerIdForPost = "1"
-    const plantIdForPost = "1"
+  // saveGameDataToDb = () => {
+  //   // Hard coded to test POST to database - to refactor//
+  //   const playerIdForPost = "1"
+  //   const plantIdForPost = "1"
 
-    fetch('http://localhost:8080/games', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        score: this.state.playerScore,
-        plant: `http://localhost:8080/plants/${plantIdForPost}`,
-        player: `http://localhost:8080/players/${playerIdForPost}`
-      })
-    })
-  }
+  //   fetch('http://localhost:8080/games', {
+  //     method: 'POST',
+  //     headers: {
+  //       'Accept': 'application/json',
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: JSON.stringify({
+  //       score: this.state.playerScore,
+  //       plant: `http://localhost:8080/plants/${plantIdForPost}`,
+  //       player: `http://localhost:8080/players/${playerIdForPost}`
+  //     })
+  //   })
+  // }
 
   reduceScoreByTimer = () => {
     if (this.state.playerScore > 0) {
