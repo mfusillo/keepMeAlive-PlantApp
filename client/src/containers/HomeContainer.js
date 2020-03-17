@@ -1,43 +1,30 @@
-import React, {Component} from 'react';
+import React, {useState, useEffect} from 'react';
 import SelectPlant from '../components/keepMeAliveComponents/SelectPlant.js';
 import NewUser from '../components/keepMeAliveComponents/NewUser.js'
 
-class HomeContainer  extends Component  {
-  constructor(props) {
-    super(props)
+const HomeContainer = ({fetchAllPlayers, plants}) => {
 
-    this.state = {
-      isIdPresent: false
-    }
-  }
+  const [isIdPresent, setIsIdPresent] = useState(false)
 
-  componentDidUpdate(prevProps, prevState){
-    if(prevState !== this.state){
-      this.props.fetchAllPlayers()
-    }
-  }
-
-  changeIsIdPresent = (status) => {
-    this.setState({isIdPresent: status})
-  }
-
-  checkPlayerIdIsInLocalStorage = (id) => {
+  useEffect(fetchAllPlayers, [])
+  
+  const checkPlayerIdIsInLocalStorage = (id) => {
  
     if (parseInt(id) === parseInt(localStorage.getItem('playerId'))) { 
-      return <SelectPlant plants={this.props.plants}/>
+      return <SelectPlant plants={plants}/>
     } else {
       return <NewUser 
-        changeIsIdPresent={this.changeIsIdPresent}
+        changeIsIdPresent={setIsIdPresent}
       />
     }
   }
 
-  render(){
-    return (
-      <>
-      {this.checkPlayerIdIsInLocalStorage(localStorage.getItem('playerId'))}
-      </>
-    )
-  }
+  return (
+    <>
+      {checkPlayerIdIsInLocalStorage(localStorage.getItem('playerId'))}
+    </>
+  )
+
 }
-export default HomeContainer;
+
+export default HomeContainer

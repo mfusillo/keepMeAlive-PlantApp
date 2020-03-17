@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, useState, useEffect} from 'react';
 import GameResult from '../components/gameComponents/GameResult.js';
 import QuizForm from '../components/gameComponents/QuizForm.js';
 import GamePlantImage from '../components/gameComponents/GamePlantImage.js';
@@ -6,52 +6,43 @@ import Timer from '../components/gameComponents/Timer.js'
 import HealthBar from '../components/gameComponents/HealthBar.js'
 import './GameContainer.css';
 
-class GameContainer extends Component{
-  constructor(props){
-    super(props)
-    this.state = {
-      players: [],
-      plant: {},
-      playerName: "",
-      playerAnswers: {
-        wateringFrequency: null,
-        fertilisationFrequency: null,
-        lightRequirement: null,
-        temperature: null
-      },
-      playerScore: 4,
-      isQuizFormActive:true
-    }
-  }
+const GameContainer = (props) => {
 
-  componentDidMount(){
-    fetch(`http://localhost:8080/plants/${this.props.match.params.plantId}`)
+  const [players, setPlayers] = useState([])
+  const [plant, setPlant] = useState({})
+  const [playerAnswers, setPlayerAnswers] = useState({
+    wateringFrequency: null,
+    fertilisationFrequency: null,
+    lightRequirement: null,
+    temperature: null
+  })
+  const [playerScore, setPlayerScore] = useState(4)
+  const [isQuizFormActive, setIsQuizFormActive] = useState(true)
+
+
+  useEffect(() => {
+    fetch(`http://localhost:8080/plants/${props.match.params.plantId}`)
     .then(response => response.json())
-    .then(plantObject => this.setState({plant: plantObject}))
+    .then(plantObject => setPlant(plantObject))
     .catch(err => console.error)
     fetch('http://localhost:8080/players')
     .then(response => response.json())
     .then(playersObject => playersObject._embedded.players)
-    .then(playersArray => this.setState({players: playersArray}))
+    .then(playersArray => setPlayers(players))
     .catch(err => console.error)
-  }
+  }, [])
 
-  componentDidUpdate(prevProps, prevState){
-    if(prevState.playerAnswers !== this.state.playerAnswers){
-      const score = this.calculateGameScore()
-      if (this.state.playerScore > 0) {
-        this.setState({playerScore: score})
-      }
-      if (this.state.playerScore <= 0) {
-        this.setState({playerScore: 0}, () => {
-          this.setGameInputStatus(false)
-        })
-      }
-      // this.saveGameDataToDb()
-    }
-  }
 
-  watchAndSetGameStatus = (arrayOfTruthSources) => {
+  useEffect(() => {
+      setPlayerScore(calculateGameScore())
+      if (playerScore <= 0) {
+        setPlayerScore(0)
+        setIsQuizFormActive(false)
+      }
+    }, [playerAnswers]
+  )
+
+  const watchAndSetGameStatus = (arrayOfTruthSources) => {
     let truthCount = 0
     arrayOfTruthSources.forEach(item => {
       if (item === false) {
@@ -59,155 +50,131 @@ class GameContainer extends Component{
       }
     })
     if (truthCount === 4) {
-      this.setGameInputStatus(false)
+      setIsQuizFormActive(false)
     }
   }
 
-  addAnswer = (answer) => {
-    const newAnswers = {...this.state.playerAnswers, ...answer}
-    this.setState({playerAnswers: newAnswers})
+  const addAnswer = (answer) => {
+    const newAnswers = {...playerAnswers, ...answer}
+    setPlayerAnswers(newAnswers)
   }
 
-  // saveGameDataToDb = () => {
-  //   // Hard coded to test POST to database - to refactor//
-  //   const playerIdForPost = "1"
-  //   const plantIdForPost = "1"
-
-  //   fetch('http://localhost:8080/games', {
-  //     method: 'POST',
-  //     headers: {
-  //       'Accept': 'application/json',
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: JSON.stringify({
-  //       score: this.state.playerScore,
-  //       plant: `http://localhost:8080/plants/${plantIdForPost}`,
-  //       player: `http://localhost:8080/players/${playerIdForPost}`
-  //     })
-  //   })
-  // }
-
-  reduceScoreByTimer = () => {
-    if (this.state.playerScore > 0) {
-      this.setState({playerScore: this.state.playerScore -1})
+  const reduceScoreByTimer = () => {
+    if (playerScore > 0) {
+      setPlayerScore(playerScore -1)
     }
-    if (this.state.playerScore <= 0){
-      this.setState({playerScore: 0}, () => {
-        this.setGameInputStatus(false)
-      })
+    if (playerScore <= 0){
+      setPlayerScore(0)
+      setIsQuizFormActive(false)
     }
   }
 
-  calculateGameScore = () => {
-    let score = this.state.playerScore
-    if (this.state.playerAnswers.wateringFrequency !== null ){
-      if (this.state.plant.wateringFrequency === this.state.playerAnswers.wateringFrequency) {
+  const calculateGameScore = () => {
+    let score = playerScore
+    if (playerAnswers.wateringFrequency !== null ){
+      if (plant.wateringFrequency === playerAnswers.wateringFrequency) {
         score += 1
       } else {
         score -= 1
       }
       const answer = {wateringFrequency: null}
-      const newAnswers = { ...this.state.playerAnswers, ...answer}
-      this.setState({playerAnswers: newAnswers})
+      const newAnswers = { ...playerAnswers, ...answer}
+      setPlayerAnswers(newAnswers)
     }
-    if (this.state.playerAnswers.fertilisationFrequency !== null ) {
-      if (this.state.plant.fertilisationFrequency === this.state.playerAnswers.fertilisationFrequency ){
+    if (playerAnswers.fertilisationFrequency !== null ) {
+      if (plant.fertilisationFrequency === playerAnswers.fertilisationFrequency ){
         score +=1
       } else {
         score -= 1
       }
       const answer = {fertilisationFrequency: null}
-      const newAnswers = { ...this.state.playerAnswers, ...answer}
-      this.setState({playerAnswers: newAnswers})
+      const newAnswers = { ...playerAnswers, ...answer}
+      setPlayerAnswers(newAnswers)
     }
-    if( this.state.playerAnswers.lightRequirement !== null) {
-      if (this.state.plant.lightRequirement === this.state.playerAnswers.lightRequirement ){
+    if(playerAnswers.lightRequirement !== null) {
+      if (plant.lightRequirement === playerAnswers.lightRequirement ){
         score +=1
       } else {
         score -= 1
       }
       const answer = {lightRequirement: null}
-      const newAnswers = { ...this.state.playerAnswers, ...answer}
-      this.setState({playerAnswers: newAnswers})
+      const newAnswers = { ...playerAnswers, ...answer}
+      setPlayerAnswers(newAnswers)
     }
-    if ( this.state.playerAnswers.temperature !== null) {
-      if (this.state.playerAnswers.temperature >= this.state.plant.minTemperature &&
-        this.state.playerAnswers.temperature <= this.state.plant.maxTemperature ){
+    if ( playerAnswers.temperature !== null) {
+      if (playerAnswers.temperature >= plant.minTemperature &&
+        playerAnswers.temperature <= plant.maxTemperature ){
           score +=1
-        } else { score -= 1 }
+        } else { 
+          score -= 1 
+        }
         const answer = {temperature: null}
-        const newAnswers = { ...this.state.playerAnswers, ...answer}
-        this.setState({playerAnswers: newAnswers})
+        const newAnswers = { ...playerAnswers, ...answer}
+        setPlayerAnswers(newAnswers)
       }
       return score
     }
 
-    setGameInputStatus = (gameStatus) => {
-      this.setState({ isQuizFormActive: gameStatus });
-    }
-
-    resetPlayerAnswers = () => {
+    const resetPlayerAnswers = () => {
       const defaultPlayerAnswers = {
         wateringFrequency: null,
         fertilisationFrequency: null,
         lightRequirement: null,
         temperature: null
       }
-      this.setState({playerAnswers: defaultPlayerAnswers})
-      this.setState({playerScore: 4})
+      setPlayerAnswers(defaultPlayerAnswers)
+      setPlayerScore(4)
     }
 
-    playAgain = () => {
-      this.resetPlayerAnswers()
-      this.setGameInputStatus(true)
+    const playAgain = () => {
+      resetPlayerAnswers()
+      setIsQuizFormActive(true)
     }
 
-    render(){
-     
-      let quizForm = null
-      let timer = null
-      if (this.state.isQuizFormActive) {
-        quizForm = <QuizForm
-        isQuizFormActive={this.state.isQuizFormActive}
-        defaultGameAnswers = {this.state.playerAnswers}
-        onAnswersSubmit={this.addAnswer}
-        setGameInputStatus = {this.setGameInputStatus}
-        watchAndSetGameStatus = {this.watchAndSetGameStatus}
-        />
+    let quizForm = null
+    let timer = null
+    if (isQuizFormActive) {
+      quizForm = <QuizForm
+      isQuizFormActive={isQuizFormActive}
+      defaultGameAnswers = {playerAnswers}
+      onAnswersSubmit={addAnswer}
+      setGameInputStatus = {isQuizFormActive}
+      watchAndSetGameStatus = {watchAndSetGameStatus}
+      />
 
-        timer = <Timer 
-          score={this.state.playerScore} 
-          reduceScoreByTimer={this.reduceScoreByTimer} 
-          setGameInputStatus={this.setGameInputStatus}
-        />
-      }
-
-      return (
-        <section className="game-page">
-          
-          <h1>{this.state.plant.commonName}</h1>
-          
-          <section className="game">
-            <div className="plant">
-              <GamePlantImage playerScore={this.state.playerScore}/>
-              <HealthBar score={this.state.playerScore}/>
-            </div>
-
-            <div className="game-box">
-              {timer}
-              {quizForm}
-      
-              <GameResult
-                playerScore={this.state.playerScore}
-                isQuizFormActive={this.state.isQuizFormActive}
-                resetPlayerAnswers={this.resetPlayerAnswers}
-                playAgain={this.playAgain}
-              />
-            </div>
-          </section>  
-        </section>
-      )
+      timer = <Timer 
+        score={playerScore} 
+        reduceScoreByTimer={reduceScoreByTimer} 
+        setGameInputStatus={isQuizFormActive}
+      />
     }
-  }
 
-  export default GameContainer;
+    return (
+      <section className="game-page">
+        
+        <h1>{plant.commonName}</h1>
+        
+        <section className="game">
+          <div className="plant">
+            <GamePlantImage playerScore={playerScore}/>
+            <HealthBar score={playerScore}/>
+          </div>
+
+          <div className="game-box">
+            {timer}
+            {quizForm}
+    
+            <GameResult
+              playerScore={playerScore}
+              isQuizFormActive={isQuizFormActive}
+              resetPlayerAnswers={resetPlayerAnswers}
+              playAgain={playAgain}
+            />
+          </div>
+        </section>  
+      </section>
+    )
+
+}
+
+export default GameContainer;
