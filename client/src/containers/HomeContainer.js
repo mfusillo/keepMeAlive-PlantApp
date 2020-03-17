@@ -2,9 +2,7 @@ import React, {useState} from 'react';
 import SelectPlant from '../components/keepMeAliveComponents/SelectPlant.js';
 import NewUser from '../components/keepMeAliveComponents/NewUser.js'
 
-const HomeContainer = ({plants}) => {
-
-  const [, setIsIdPresent] = useState(false)
+const HomeContainer = ({plants, setIsIdPresent}) => {
 
   const checkPlayerIdIsInLocalStorage = (id) => {
  
@@ -12,7 +10,7 @@ const HomeContainer = ({plants}) => {
       return <SelectPlant plants={plants}/>
     } else {
       return <NewUser 
-        changeIsIdPresent={setIsIdPresent}
+        setIsIdPresent={setIsIdPresent}
       />
     }
   }

@@ -1,7 +1,7 @@
 import React, {useState} from 'react'
 import './NewUser.css'
 
-const NewUser = ({changeIsIdPresent}) => {
+const NewUser = ({setIsIdPresent}) => {
   const [name, setName] = useState()  
 
   const handleNewUserNameEntry = (event) => {
@@ -26,7 +26,7 @@ const NewUser = ({changeIsIdPresent}) => {
 
   const setLocalStorageNewUserIdFromDatabase = (id) => {
       localStorage.setItem('playerId', id)
-      changeIsIdPresent(true)
+      setIsIdPresent(true)
   }
 
   const handleNameChange = (event) => {

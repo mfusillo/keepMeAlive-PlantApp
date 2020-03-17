@@ -33,7 +33,7 @@ export default class Timer extends Component {
       }))
       if(this.state.seconds === 0){
         clearInterval(this.myInterval)
-        this.props.setGameInputStatus(false)
+        this.props.setIsQuizFormActive(false)
       }
     }, 1000)
 

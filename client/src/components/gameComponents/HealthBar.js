@@ -3,7 +3,7 @@ import './HealthBar.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faHeart } from '@fortawesome/fontawesome-free-solid'
 
-function HealthBar({score}) {
+const HealthBar= ({score}) => {
   const scoreInPercentage = score * 12.5
 
   const fillerClass = () =>{

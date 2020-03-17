@@ -2,21 +2,32 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom'
 import './PlantInfo.css'
 
-const PlantInfo = () => {
+const PlantInfo = ({plants}) => {
   
   const [plant, setPlant] = useState({});
 
   let { plantId } = useParams()
 
+
+
   const getPlant = () => {
-    fetch(`http://localhost:8080/plants/${plantId}`)
-      .then(response => response.json())
-      .then(plantObject => setPlant(plantObject))
-      .catch(err => console.error)
+    for(plant of plants){
+      if(plant.id === plantId){
+        setPlant(plant)
+      }
+    }
+    // fetch(`http://localhost:8080/plants/${plantId}`)
+    //   .then(response => response.json())
+    //   .then(plantObject => setPlant(plantObject))
+    //   .catch(err => console.error)
   }
 
   useEffect( () => {
-    getPlant();
+    for(let plant of plants){
+      if(plant.id === parseInt(plantId)){
+        setPlant(plant)
+      }
+    }
   }, [])
 
   if(!plant.commonName) return null;

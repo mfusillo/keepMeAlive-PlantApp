@@ -9,6 +9,7 @@ const KeepMeAliveContainer = (props) => {
 
   const [plants, setPlants] = useState([])
   const [players, setPlayers] = useState([])
+  const [isIdPresent, setIsIdPresent] = useState(false)
 
 
   useEffect(() => {
@@ -20,7 +21,8 @@ const KeepMeAliveContainer = (props) => {
 
     fetchAllPlayers()
   }, [])
-  
+
+  useEffect(() => fetchAllPlayers(), [isIdPresent])
 
   const fetchAllPlayers = () => {
       fetch('http://localhost:8080/players')
@@ -31,17 +33,10 @@ const KeepMeAliveContainer = (props) => {
   }
 
   const isPlayerIdInLocalstorage = () => {
-    if(players.find(player => {
-      return player.id === parseInt(localStorage.getItem('playerId'))
-    }
-    )){
-      return true
-    } else {
-      return false
-    }
+    return players.some(player => player.id === parseInt(localStorage.getItem('playerId')))
   }
 
-  if(!players){
+  if(!players.length){
     return null
   }
 
@@ -52,14 +47,12 @@ const KeepMeAliveContainer = (props) => {
         <Switch>
           <Route exact path="/"
             render={() =>
-            <HomeContainer
+            <HomeContainer setIsIdPresent={setIsIdPresent}
             plants={plants} 
             />}
           />
-          <Route exact path="/:plantId/game" render={({match}) => isPlayerIdInLocalstorage() ?<GameContainer match={match} /> : <Redirect to="/" />} />
-   
-
-          <Route exact path="/:plantId" render={({match}) => isPlayerIdInLocalstorage() ?<PlantInfo match={match} /> : <Redirect to="/" />} />
+          <Route exact path="/:plantId/game" render={() => isPlayerIdInLocalstorage() ? <GameContainer  /> : <Redirect to="/" />} />
+          <Route exact path="/:plantId" render={() => isPlayerIdInLocalstorage() ? <PlantInfo plants={plants}/> : <Redirect to="/" />} />
         </Switch>
       </Router>
 

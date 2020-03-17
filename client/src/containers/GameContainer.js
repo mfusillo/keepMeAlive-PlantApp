@@ -5,6 +5,7 @@ import GamePlantImage from '../components/gameComponents/GamePlantImage.js';
 import Timer from '../components/gameComponents/Timer.js'
 import HealthBar from '../components/gameComponents/HealthBar.js'
 import './GameContainer.css';
+import { useParams } from 'react-router-dom';
 
 const GameContainer = (props) => {
 
@@ -18,10 +19,11 @@ const GameContainer = (props) => {
   })
   const [playerScore, setPlayerScore] = useState(4)
   const [isQuizFormActive, setIsQuizFormActive] = useState(true)
+  const {plantId} = useParams()
 
 
   useEffect(() => {
-    fetch(`http://localhost:8080/plants/${props.match.params.plantId}`)
+    fetch(`http://localhost:8080/plants/${plantId}`)
     .then(response => response.json())
     .then(plantObject => setPlant(plantObject))
     .catch(err => console.error)
@@ -145,7 +147,7 @@ const GameContainer = (props) => {
       timer = <Timer 
         score={playerScore} 
         reduceScoreByTimer={reduceScoreByTimer} 
-        setGameInputStatus={isQuizFormActive}
+        setIsQuizFormActive={setIsQuizFormActive}
       />
     }
 
