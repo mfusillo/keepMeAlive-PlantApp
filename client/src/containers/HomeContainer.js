@@ -1,13 +1,11 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import SelectPlant from '../components/keepMeAliveComponents/SelectPlant.js';
 import NewUser from '../components/keepMeAliveComponents/NewUser.js'
 
-const HomeContainer = ({fetchAllPlayers, plants}) => {
+const HomeContainer = ({plants}) => {
 
-  const [isIdPresent, setIsIdPresent] = useState(false)
+  const [, setIsIdPresent] = useState(false)
 
-  useEffect(fetchAllPlayers, [])
-  
   const checkPlayerIdIsInLocalStorage = (id) => {
  
     if (parseInt(id) === parseInt(localStorage.getItem('playerId'))) { 

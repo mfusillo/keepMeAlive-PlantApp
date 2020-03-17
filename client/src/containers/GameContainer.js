@@ -1,4 +1,4 @@
-import React, {Component, useState, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import GameResult from '../components/gameComponents/GameResult.js';
 import QuizForm from '../components/gameComponents/QuizForm.js';
 import GamePlantImage from '../components/gameComponents/GamePlantImage.js';
